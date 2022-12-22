@@ -80,7 +80,7 @@ public class JavalinApp {
         }
         catch(EmailNotUniqueException e){
             ctx.status(401);
-            ctx.result("email not unique");
+            ctx.result("Email is taken, please try a different Email.");
         }
 
         ctx.status(201);
@@ -104,7 +104,7 @@ public class JavalinApp {
         }
         catch(EmailNotUniqueException e){
             ctx.status(401);
-            ctx.result("email not unique");
+            ctx.result("Email is taken, please try a different Email.");
         }
 
         ctx.status(201);
