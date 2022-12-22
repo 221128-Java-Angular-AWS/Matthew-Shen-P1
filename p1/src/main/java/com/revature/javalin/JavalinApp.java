@@ -2,6 +2,7 @@ package com.revature.javalin;
 
 import com.revature.exceptions.EmailNotUniqueException;
 import com.revature.exceptions.InvalidTicketInputException;
+import com.revature.exceptions.InvalidUserInputException;
 import com.revature.exceptions.PasswordIncorrectException;
 import com.revature.exceptions.UserNotAuthorized;
 import com.revature.exceptions.UserNotFoundException;
@@ -58,6 +59,7 @@ public class JavalinApp {
 
         app.post("/manager", JavalinApp::postNewManager);
         app.get("/manager", JavalinApp::getAllManagers);
+        app.post("/manager/auth", JavalinApp::authenticateManager);
 
     }
 
@@ -67,10 +69,14 @@ public class JavalinApp {
 
     }
 
-    public static void postNewUser(Context ctx){
+    public static void postNewUser(Context ctx) throws InvalidUserInputException{
         User newUser = ctx.bodyAsClass(User.class);
         try {
             userService.registerNewUser(newUser);
+        }
+        catch(InvalidUserInputException e){
+            ctx.status(401);
+            ctx.result("Email or password must be inputted");
         }
         catch(EmailNotUniqueException e){
             ctx.status(401);
@@ -82,14 +88,19 @@ public class JavalinApp {
 
     public static void getAllUsers(Context ctx) {
         ArrayList<User> users = userService.getAllUsers();
+        System.out.println(users.toString());
         ctx.json(users);
         ctx.status(200);
     }
 
-    public static void postNewManager(Context ctx){
+    public static void postNewManager(Context ctx) throws InvalidUserInputException, EmailNotUniqueException{
         Manager newManager = ctx.bodyAsClass(Manager.class);
         try {
             managerService.registerManager(newManager);
+        }
+        catch(InvalidUserInputException e){
+            ctx.status(401);
+            ctx.result("Email or password must be inputted");
         }
         catch(EmailNotUniqueException e){
             ctx.status(401);
@@ -100,8 +111,8 @@ public class JavalinApp {
     }
 
     public static void getAllManagers(Context ctx) {
-        ArrayList<User> users = userService.getAllUsers();
-        ctx.json(users);
+        ArrayList<Manager> managers = managerService.getAllManagers();
+        ctx.json(managers);
         ctx.status(200);
     }
 
@@ -109,6 +120,21 @@ public class JavalinApp {
         User auth = ctx.bodyAsClass(User.class);
         try {
             userService.authenticateUser(auth.getUsername(), auth.getPassword());
+        } catch(UserNotFoundException e) {
+            ctx.status(401);
+            ctx.result("User not found.");
+        } catch(PasswordIncorrectException e) {
+            ctx.status(401);
+            ctx.result("Password incorrect.");
+
+        }
+    }
+
+    public static void authenticateManager(Context ctx) {
+        String username = ctx.queryParam("username");
+        String password = ctx.queryParam("password");
+        try {
+            managerService.authenticateUser(username, password);
         } catch(UserNotFoundException e) {
             ctx.status(401);
             ctx.result("User not found.");

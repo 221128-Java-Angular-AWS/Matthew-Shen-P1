@@ -9,7 +9,6 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 
-import org.omg.CORBA.DynAnyPackage.Invalid;
 
 public class ExpenseDao {
     private Connection connection;
@@ -23,7 +22,7 @@ public class ExpenseDao {
             if(expense.getDescription().equals("") || expense.getAmount() == 0){
                 throw new InvalidTicketInputException("ticket needs description and amount");
             }
-            
+
             String sql = "INSERT INTO expenses (title, description, amount, status, user_id) VALUES (?, ?, ?, ?, ?)";
             PreparedStatement pstmt = connection.prepareStatement(sql);
             pstmt.setString(1, expense.getTitle());

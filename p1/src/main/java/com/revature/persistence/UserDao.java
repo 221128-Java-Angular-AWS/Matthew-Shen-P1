@@ -3,6 +3,7 @@ package com.revature.persistence;
 import com.revature.exceptions.PasswordIncorrectException;
 import com.revature.exceptions.UserNotFoundException;
 import com.revature.exceptions.EmailNotUniqueException;
+import com.revature.exceptions.InvalidUserInputException;
 import com.revature.pojos.User;
 
 import java.sql.*;
@@ -17,8 +18,11 @@ public class UserDao {
         this.connection = ConnectionManager.getConnection();
     }
 
-    public void create(User user) throws EmailNotUniqueException{
+    public void create(User user) throws EmailNotUniqueException, InvalidUserInputException{
         try {
+            if(user.getUsername().equals("")|| user.getPassword().equals("")){
+                throw new InvalidUserInputException("Email or password must not be null");
+            }
             String sql = "SELECT * FROM users WHERE username = ?";
             PreparedStatement pstmt = connection.prepareStatement(sql);
             pstmt.setString(1, user.getUsername());

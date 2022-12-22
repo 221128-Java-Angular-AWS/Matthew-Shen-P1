@@ -1,18 +1,17 @@
 package com.revature.pojos;
 
-public class Manager extends User{
-    private Integer userId;
+public class Manager{
+    private Integer managerId;
     private String firstName;
     private String lastName;
     private String username;
     private String password;
-    private final boolean admin = true;
 
     public Manager(){
     }
 
-    public Manager(Integer userId, String firstName, String lastName, String username, String password) {
-        this.userId = userId;
+    public Manager(Integer managerId, String firstName, String lastName, String username, String password) {
+        this.managerId = managerId;
         this.firstName = firstName;
         this.lastName = lastName;
         this.username = username;
@@ -26,16 +25,13 @@ public class Manager extends User{
         this.password = password;
     }
 
-    public boolean getAdmin(){
-        return admin;
-    }
     
     public void setManagerId(Integer i){
-        this.userId = i;
+        this.managerId = i;
     }
 
     public Integer getManagerId(){
-        return userId;
+        return managerId;
     }
     public String getFirstName() {
         return firstName;
@@ -71,10 +67,11 @@ public class Manager extends User{
     @Override
     public String toString() {
         return "Manager{" +
-                "userId=" + userId +
+                "managerId=" + managerId +
                 ", firstName='" + firstName + '\'' +
                 ", lastName='" + lastName + '\'' +
                 ", username='" + username + '\'' +
+                ", password='" + password + '\'' +
                 ", password='" + password + '\'' +
                 '}';
     }

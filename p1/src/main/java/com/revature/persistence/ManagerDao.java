@@ -1,22 +1,27 @@
 package com.revature.persistence;
 
+
+import com.revature.exceptions.EmailNotUniqueException;
+import com.revature.exceptions.InvalidUserInputException;
 import com.revature.exceptions.PasswordIncorrectException;
 import com.revature.exceptions.UserNotFoundException;
-import com.revature.exceptions.EmailNotUniqueException;
 import com.revature.pojos.Manager;
-import com.revature.pojos.User;
 
 import java.sql.*;
 import java.util.ArrayList;
 
-public class ManagerDao extends UserDao{
+public class ManagerDao{
     private Connection connection;
 
     public ManagerDao() {
         this.connection = ConnectionManager.getConnection();
     }
-    public void create(Manager manager) throws EmailNotUniqueException{
+    public void create(Manager manager) throws EmailNotUniqueException, InvalidUserInputException{
         try {
+            if(manager.getUsername().equals("")|| manager.getPassword().equals("")){
+                throw new InvalidUserInputException("Email or password must not be null");
+            }
+
             String sql = "SELECT * FROM managers WHERE username = ?";
             PreparedStatement pstmt = connection.prepareStatement(sql);
             pstmt.setString(1, manager.getUsername());
@@ -45,4 +50,50 @@ public class ManagerDao extends UserDao{
             throw new RuntimeException(e);
         }
     }
+    public Manager authenticate(String username, String password) throws UserNotFoundException, PasswordIncorrectException {
+        try {
+            String sql = "SELECT * FROM managers WHERE username = ?";
+            PreparedStatement pstmt = connection.prepareStatement(sql);
+            pstmt.setString(1, username);
+    
+            ResultSet rs = pstmt.executeQuery();
+    
+            if(!rs.next()) {
+                throw new UserNotFoundException("This username was not found");
+            }
+    
+            Manager manager = new Manager(rs.getInt("manager_id"), rs.getString("first_name"),
+                    rs.getString("last_name"), rs.getString("username"), rs.getString("password"));
+    
+            if(manager.getPassword().equals(password)) {
+                return manager;
+            }
+    
+            throw new PasswordIncorrectException("That password is not correct");
+    
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public ArrayList<Manager> getAllManagers() {
+        try {
+            String sql = "SELECT * FROM managers";
+            PreparedStatement pstmt = connection.prepareStatement(sql);
+            ResultSet rs = pstmt.executeQuery();
+            ArrayList<Manager> results = new ArrayList<>();
+            while(rs.next()) {
+                Manager manager = new Manager(rs.getInt("manager_id"), rs.getString("first_name"),
+                        rs.getString("last_name"), rs.getString("username"), rs.getString("password"));
+                results.add(manager);
+            }
+
+            return results;
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
 }
+
+

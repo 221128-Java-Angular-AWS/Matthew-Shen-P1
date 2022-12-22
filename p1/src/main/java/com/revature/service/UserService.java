@@ -3,6 +3,7 @@ package com.revature.service;
 import com.revature.exceptions.PasswordIncorrectException;
 import com.revature.exceptions.UserNotFoundException;
 import com.revature.exceptions.EmailNotUniqueException;
+import com.revature.exceptions.InvalidUserInputException;
 import com.revature.persistence.UserDao;
 import com.revature.pojos.User;
 
@@ -15,7 +16,7 @@ public class UserService {
         this.dao = dao;
     }
 
-    public void registerNewUser(User user) throws EmailNotUniqueException{
+    public void registerNewUser(User user) throws EmailNotUniqueException, InvalidUserInputException{
         dao.create(user);
     }
 

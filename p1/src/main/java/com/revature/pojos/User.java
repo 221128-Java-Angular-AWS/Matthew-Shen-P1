@@ -8,7 +8,6 @@ public class User {
     private String lastName;
     private String username;
     private String password;
-    private final boolean admin = false;
 
     public User() {
     }
@@ -68,9 +67,6 @@ public class User {
         this.password = password;
     }
 
-    public boolean getAdmin(){
-        return admin;
-    }
 
 
     @Override
@@ -79,11 +75,6 @@ public class User {
         if (o == null || getClass() != o.getClass()) return false;
         User user = (User) o;
         return Objects.equals(userId, user.userId) && Objects.equals(firstName, user.firstName) && Objects.equals(lastName, user.lastName) && Objects.equals(username, user.username) && Objects.equals(password, user.password);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(userId, firstName, lastName, username, password);
     }
 
     @Override
