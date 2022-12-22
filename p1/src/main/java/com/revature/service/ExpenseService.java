@@ -1,5 +1,6 @@
 package com.revature.service;
 import com.revature.exceptions.InvalidTicketInputException;
+import com.revature.exceptions.TicketAlreadyProcessedException;
 import com.revature.exceptions.UserNotAuthorized;
 import com.revature.persistence.ExpenseDao;
 import com.revature.pojos.Expense;
@@ -24,11 +25,11 @@ public class ExpenseService {
         return dao.read(expense.getExpenseId());
     }
 
-    public void updateExpense(Expense expense) {
+    public void updateExpense(Expense expense , Integer managerId, int expenseId) throws TicketAlreadyProcessedException {
         dao.update(expense);
     }
 
-    public void consider(Integer expenseId, Integer managerId, String status) throws UserNotAuthorized{
+    public void consider(Integer expenseId, Integer managerId, String status) throws UserNotAuthorized, TicketAlreadyProcessedException{
         dao.consider(expenseId, managerId, status);
     }
 

@@ -4,6 +4,7 @@ import com.revature.exceptions.EmailNotUniqueException;
 import com.revature.exceptions.InvalidTicketInputException;
 import com.revature.exceptions.InvalidUserInputException;
 import com.revature.exceptions.PasswordIncorrectException;
+import com.revature.exceptions.TicketAlreadyProcessedException;
 import com.revature.exceptions.UserNotAuthorized;
 import com.revature.exceptions.UserNotFoundException;
 import com.revature.persistence.ExpenseDao;
@@ -53,7 +54,7 @@ public class JavalinApp {
         app.get("/expense/pending", JavalinApp::getPending);
         app.put("/expense/consider", JavalinApp::updateExpenseStatus);
         app.post("/expense", JavalinApp::postNewExpense);
-        app.put("/expense", JavalinApp::updateExpense);
+        // app.put("/expense", JavalinApp::updateExpense);
         app.delete("/expense", JavalinApp::deleteExpense);
         app.get("/expense/history", JavalinApp::getHistory);
 
@@ -178,15 +179,22 @@ public class JavalinApp {
         ctx.json(expense);
         ctx.status(200);
     }
-
-    public static void updateExpense(Context ctx) {
+/* 
+    public static void updateExpense(Context ctx) throws TicketAlreadyProcessedException {
         Expense expense = ctx.bodyAsClass(Expense.class);
-        expenseService.updateExpense(expense);
-
+        int expenseId = Integer.parseInt(ctx.queryParam("expense_id"));
+        int managerId = Integer.parseInt(ctx.queryParam("manager_id"));
+        try{
+            expenseService.updateExpense(expense, managerId, expenseId);
+        }
+        catch(TicketAlreadyProcessedException e){
+            ctx.status(401);
+            ctx.result("This ticket has already been processed.");
+        }
         ctx.status(201);
-    }
+    }*/
 
-    public static void updateExpenseStatus(Context ctx) throws UserNotAuthorized {
+    public static void updateExpenseStatus(Context ctx) throws UserNotAuthorized, TicketAlreadyProcessedException {
         int expenseId = Integer.parseInt(ctx.queryParam("expense_id"));
         int managerId = Integer.parseInt(ctx.queryParam("manager_id"));
         String status = (ctx.queryParam("status"));
@@ -197,7 +205,11 @@ public class JavalinApp {
             ctx.status(401);
             ctx.result("This user is not authorized");
         }
-        ctx.status(201);
+        catch(TicketAlreadyProcessedException e){
+            ctx.status(401);
+            ctx.result("This ticket has already been processed.");
+        }
+        ctx.status(200);
     }
 
     public static void deleteExpense(Context ctx) {

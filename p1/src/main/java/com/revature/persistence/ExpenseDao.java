@@ -3,6 +3,8 @@ package com.revature.persistence;
 import com.revature.pojos.Expense;
 import com.revature.exceptions.UserNotAuthorized;
 import com.revature.exceptions.InvalidTicketInputException;
+import com.revature.exceptions.TicketAlreadyProcessedException;
+
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -168,7 +170,7 @@ public class ExpenseDao {
     }   
 
     // approve or deny a ticket
-    public void consider(Integer expenseId, Integer managerId, String status) throws UserNotAuthorized{
+    public void consider(Integer expenseId, Integer managerId, String status) throws UserNotAuthorized, TicketAlreadyProcessedException{
         try {
             String sql = "SELECT * FROM managers WHERE manager_id = ?";
             PreparedStatement pstmt = connection.prepareStatement(sql);
@@ -179,7 +181,14 @@ public class ExpenseDao {
             if(!rs.next()) {
                 throw new UserNotAuthorized("UserNotAuthorized");
             }
-
+            String sql4 = "SELECT * FROM expenses WHERE expense_id = ?";
+            PreparedStatement pstmt4 = connection.prepareStatement(sql4);
+            pstmt4.setInt(1, expenseId);
+            ResultSet rs4 = pstmt4.executeQuery();
+            rs4.next();
+            if(!rs4.getString("status").equals("Pending")){
+                throw new TicketAlreadyProcessedException("Ticket has already been processed");
+            }
             String sql2 = "UPDATE expenses SET status = ? WHERE expense_id = ?";
             PreparedStatement pstmt2 = connection.prepareStatement(sql2);
             pstmt2.setString(1, status);
@@ -212,8 +221,11 @@ public class ExpenseDao {
         return null;
     }  
 
-    public void update(Expense expense) {
+    public void update(Expense expense) throws TicketAlreadyProcessedException {
         try {
+            if(expense.getStatus()!= "Pending"){
+                throw new TicketAlreadyProcessedException("Ticket has already been processed");
+            }
             String sql = "UPDATE expenses SET title = ?, description = ?, amount = ?, status = ?, user_id = ?";
             PreparedStatement pstmt = connection.prepareStatement(sql);
             pstmt.setString(1, expense.getTitle());
